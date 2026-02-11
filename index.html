@@ -339,9 +339,9 @@
           current += ch;
           msgEl.textContent = current;
           msgEl.appendChild(caret);
-          await sleep(10 + Math.random()*16);
+          await sleep(20 + Math.random()*32);
         }
-        await sleep(line === "" ? 160 : 220);
+        await sleep(line === "" ? 320 : 440);
       }
 
       caret.remove();
