@@ -11,8 +11,6 @@
       --bg2:#090d2b;
 
       --fg: rgba(245,248,255,.94);
-      --muted: rgba(205,215,240,.78);
-
       --border: rgba(170,200,255,.16);
 
       --ice:#9ac6ff;
@@ -162,7 +160,7 @@
         linear-gradient(180deg, rgba(0,0,0,.68), rgba(0,0,0,.48));
       box-shadow: inset 0 0 0 1px rgba(0,0,0,.60), inset 0 0 55px rgba(0,0,0,.70);
       padding: 18px 18px;
-      min-height: 220px;
+      min-height: 240px;
       position:relative;
       overflow:hidden;
     }
@@ -201,7 +199,7 @@
       line-height: 1.60;
       color: rgba(245,248,255,.88);
       white-space: pre-wrap;
-      min-height: 92px;
+      min-height: 118px;
     }
     .sig{
       margin-top: 12px;
@@ -217,8 +215,6 @@
       gap:10px;
       justify-content:flex-end;
       flex-wrap:wrap;
-      position:relative;
-      min-height: 56px; /* espace stable si un bouton se déplace */
     }
 
     .btn{
@@ -247,16 +243,6 @@
     }
     .btn[disabled]{ opacity:.45; cursor:not-allowed; transform:none !important; box-shadow:none !important; }
 
-    /* Bouton fuyant */
-    .btnRun{
-      position:absolute; /* on le sort du flux pour pouvoir le déplacer */
-      right: 0;
-      top: 0;
-      min-width: 170px;
-      border-color: rgba(154,198,255,.20);
-      background: rgba(255,255,255,.04);
-    }
-
     /* caret */
     .caret{
       display:inline-block;
@@ -279,7 +265,6 @@
     @media (max-width: 420px){
       .headline{ font-size: 20px; }
       .btn{ min-width: 150px; }
-      .btnRun{ min-width: 150px; }
     }
   </style>
 </head>
@@ -297,7 +282,7 @@
     <section class="card" role="region" aria-label="Message pour Hagere">
       <header class="top">
         <div class="title"><span class="dot"></span> Pour Hagere <span class="heartBadge">♥</span></div>
-        <div class="pill">Nuit étoilée </div>
+        <div class="pill">Nuit étoilée</div>
       </header>
 
       <div class="content">
@@ -307,13 +292,10 @@
           <div class="sig" id="sig">— Ton cousin</div>
         </div>
 
-        <div class="actions" id="actions">
+        <div class="actions">
           <button class="btn btnPrimary" id="btnRead">Lire le message</button>
           <button class="btn" id="btnReplay" disabled>Relire</button>
           <button class="btn" id="btnHearts" title="Surprise 💗">Envoyer des cœurs</button>
-
-          <!-- bouton fuyant -->
-          <button class="btn btnRun" id="btnSkip" type="button">Ne pas lire</button>
         </div>
       </div>
     </section>
@@ -327,28 +309,18 @@
     const btnReplay = document.getElementById("btnReplay");
     const btnHearts = document.getElementById("btnHearts");
 
-    const actions = document.getElementById("actions");
-    const btnSkip = document.getElementById("btnSkip");
-
     const lines = [
-      "Hagere,",
+      "Ma cousine,",
       "",
-      "Je voulais juste te laisser un message simple, mais sincère.",
-      "Tu es une femme extraordinaire.",
+      "Je veux que tu saches une chose simple mais essentielle : tu es une femme extraordinaire. Tu as une valeur immense, même dans les moments où tu en doutes, même dans les jours où tu te sens plus fragile. Tu mérites le respect, la paix, et tout ce qu’il y a de beau dans cette vie.",
       "",
-      "Tu as une valeur immense — même quand tu doutes.",
-      "Tu mérites le respect, la paix, et de belles choses.",
+      "Je suis très fier de toi, de la personne que tu es, de ta force, de ton cœur. Je t’envoie beaucoup d’amour et énormément de courage pour la suite. J’espère sincèrement que tout ira pour le mieux pour toi.",
       "",
-      "Je suis fier de toi.",
-      "Et je t’envoie beaucoup d’amour et de force pour la suite.",
-      "",
-      "J’espère sincèrement que tout va aller pour le mieux pour toi.",
-      "Si tu doutes un jour… reviens ici et relis ça."
+      "Et si un jour tu doutes, reviens lire ces quelques mots : quelqu’un croit profondément en toi, et cette personne, c’est moi."
     ];
 
     function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
     function rand(a,b){ return a + Math.random()*(b-a); }
-    function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
 
     async function typeLines(){
       btnRead.disabled = true;
@@ -367,15 +339,15 @@
           current += ch;
           msgEl.textContent = current;
           msgEl.appendChild(caret);
-          await sleep(16 + Math.random()*22);
+          await sleep(10 + Math.random()*16);
         }
-        await sleep(line === "" ? 140 : 220);
+        await sleep(line === "" ? 160 : 220);
       }
+
       caret.remove();
       sigEl.style.display = "block";
       btnReplay.disabled = false;
 
-      // petit feu d’artifice de cœurs discret après lecture
       burstHearts(window.innerWidth * 0.5, window.innerHeight * 0.55, 16);
     }
 
@@ -410,7 +382,7 @@
       ctxH.setTransform(dpr,0,0,dpr,0,0);
     }
 
-    window.addEventListener("resize", () => { fit(); initStars(); resetSkipHome(); }, { passive:true });
+    window.addEventListener("resize", () => { fit(); initStars(); }, { passive:true });
     fit();
 
     let mouseX = 0, mouseY = 0;
@@ -513,7 +485,7 @@
       }
     }
 
-    // ---------- Hearts (canvas particles) ----------
+    // ---------- Hearts ----------
     const hearts = [];
     function heartPath(ctx, x, y, size){
       ctx.beginPath();
@@ -536,20 +508,19 @@
           rot: rand(0, Math.PI*2),
           vr: rand(-0.08, 0.08),
           life: 0,
-          max: rand(70, 110),
+          max: rand(70, 120),
           hue: Math.random()<0.7 ? "pink" : (Math.random()<0.5 ? "gold" : "ice")
         });
       }
     }
 
-    // ✅ MODIF 1 : cœurs aléatoires sur toute la fenêtre
+    // cœurs aléatoires sur toute la fenêtre
     function surpriseHearts(){
-      const bursts = Math.floor(rand(6, 12)); // nombre de zones
+      const bursts = Math.floor(rand(7, 13));
       for(let i=0;i<bursts;i++){
         const x = rand(40, window.innerWidth - 40);
         const y = rand(60, window.innerHeight - 60);
         const count = Math.floor(rand(6, 14));
-        // petit décalage dans le temps pour un effet "cascade"
         setTimeout(() => burstHearts(x, y, count), i * 80);
       }
     }
@@ -558,9 +529,8 @@
       surpriseHearts();
     });
 
-    // clic dans la page -> quelques cœurs à l’endroit du clic (ça reste sympa)
+    // clic dans la page -> quelques cœurs là où on clique (hors boutons)
     window.addEventListener("click", (e) => {
-      // évite d'overclutter si on clique sur les boutons
       const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : "";
       if(tag === "button") return;
       burstHearts(e.clientX, e.clientY, 6);
@@ -598,7 +568,7 @@
       }
     }
 
-    // ---------- Constellation lines near cursor (subtle) ----------
+    // ---------- Constellation lines near cursor ----------
     function drawConstellation(ctx, stars){
       const mx = mouseX, my = mouseY;
       const near = [];
@@ -623,80 +593,6 @@
       ctx.restore();
     }
 
-    // ---------- MODIF 2 : bouton "Ne pas lire" fuyant ----------
-    let trapEnabled = true;
-
-    // place le bouton à un endroit "propre" dans la zone actions
-    function resetSkipHome(){
-      if(!actions || !btnSkip) return;
-
-      // On le cale en haut à droite de la zone actions
-      btnSkip.style.position = "absolute";
-      btnSkip.style.right = "0px";
-      btnSkip.style.top = "0px";
-    }
-    resetSkipHome();
-
-    // On empêche le clic (au cas où)
-    btnSkip.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      // petit "bonus" : des cœurs en réaction si on essaie
-      burstHearts(btnSkip.getBoundingClientRect().left + 40, btnSkip.getBoundingClientRect().top + 20, 8);
-    });
-
-    function moveSkipAway(px, py){
-      if(!trapEnabled) return;
-
-      const area = actions.getBoundingClientRect();
-      const b = btnSkip.getBoundingClientRect();
-
-      const cx = b.left + b.width/2;
-      const cy = b.top + b.height/2;
-      const dist = Math.hypot(px - cx, py - cy);
-
-      const trigger = 140;
-      if(dist > trigger) return;
-
-      const padding = 6;
-      const maxX = area.width  - b.width  - padding;
-      const maxY = area.height - b.height - padding;
-
-      let tries = 0, nx = 0, ny = 0;
-      do{
-        nx = padding + Math.random() * maxX;
-        ny = padding + Math.random() * maxY;
-        const nCenterX = area.left + nx + b.width/2;
-        const nCenterY = area.top  + ny + b.height/2;
-        if(Math.hypot(px - nCenterX, py - nCenterY) > 180) break;
-        tries++;
-      } while(tries < 10);
-
-      // On positionne via "right/top" ou "left/top"
-      btnSkip.style.right = "auto";
-      btnSkip.style.left = `${clamp(nx, padding, maxX)}px`;
-      btnSkip.style.top  = `${clamp(ny, padding, maxY)}px`;
-    }
-
-    document.addEventListener("mousemove", (e) => {
-      moveSkipAway(e.clientX, e.clientY);
-    }, { passive:true });
-
-    document.addEventListener("touchmove", (e) => {
-      const t = e.touches && e.touches[0];
-      if(!t) return;
-      moveSkipAway(t.clientX, t.clientY);
-    }, { passive:true });
-
-    document.addEventListener("touchstart", (e) => {
-      const t = e.touches && e.touches[0];
-      if(!t) return;
-      moveSkipAway(t.clientX, t.clientY);
-    }, { passive:true });
-
-    // si on lit le message, on laisse le bouton fuyant (ou tu peux le désactiver)
-    // trapEnabled = false; -> si tu veux qu'après lecture il ne bouge plus
-
     // ---------- Main loop ----------
     function loop(){
       drawStars(ctx1, starsA, 0.010);
@@ -709,29 +605,6 @@
       drawHearts();
 
       requestAnimationFrame(loop);
-    }
-
-    // ---------- Init loop helpers ----------
-    function drawStars(ctx, stars, parallax){
-      ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
-      const px = (mouseX - window.innerWidth/2) * parallax;
-      const py = (mouseY - window.innerHeight/2) * parallax;
-
-      for(const s of stars){
-        s.phase += s.tw;
-        const tw = (Math.sin(s.phase)*0.18 + 0.82);
-        const a = s.a * tw;
-        ctx.beginPath();
-        ctx.fillStyle = starColor(s.hue, a);
-        ctx.arc(s.x + px, s.y + py, s.r, 0, Math.PI*2);
-        ctx.fill();
-      }
-    }
-
-    function starColor(hue, alpha){
-      if(hue==="pink") return `rgba(255,121,198,${alpha})`;
-      if(hue==="gold") return `rgba(255,210,122,${alpha})`;
-      return `rgba(154,198,255,${alpha})`;
     }
 
     loop();
